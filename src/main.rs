@@ -5,9 +5,6 @@ use std::path::Path;
 use dirs;
 use std::fs::OpenOptions;
 use std::io::Write;
-use druid::widget::prelude::*;
-
-
 
 
 
@@ -55,19 +52,19 @@ impl MyApp {
     }
 
     let formatted_replace = if self.replace.contains('\n') {
-      let indented_replace = self.replace
-        .lines()
-        .map(|line| format!("   {}", line))  // Add as many spaces as you need here
-        .collect::<Vec<_>>()
-        .join("\n");
-      format!("\n- trigger: '{}'\n  replace: |\n{}\n", self.trigger, indented_replace)
-    } else {
-      format!("\n- trigger: '{}'\n  replace: '{}'\n", self.trigger, self.replace)
-    };
-
-    file.write_all(formatted_replace.as_bytes())?;
-    Ok(())
-  }
+        let indented_replace = self.replace
+          .lines()
+          .map(|line| format!("   {}", line))  // Add as many spaces as you need here
+          .collect::<Vec<_>>()
+          .join("\n");
+        format!("\n- trigger: '{}'\n  replace: |\n{}\n", self.trigger, indented_replace)
+      } else {
+        format!("\n- trigger: '{}'\n  replace: '{}'\n", self.trigger, self.replace)
+      };
+  
+      file.write_all(formatted_replace.as_bytes())?;
+      Ok(())
+    }
   // other methods...
 }
 
@@ -115,10 +112,14 @@ fn ui_builder() -> impl Widget<MyApp> {
             open_folder().expect("Failed to open folder");
         });
 
-    let append_button = Button::new("Append")
-        .on_click(|_ctx, data: &mut MyApp, _env| {
-            data.append_to_file().expect("Failed to append to file");
-        });
+  let append_button = Button::new("Append")
+      .on_click(|_ctx, data: &mut MyApp, _env| {
+          if data.trigger.is_empty() {
+              println!("Trigger is empty. Operation cancelled.");
+          } else {
+              data.append_to_file().expect("Failed to append to file");
+          }
+      });
 
     let trigger_and_button = Flex::row()
         .with_child(trigger_textbox)
