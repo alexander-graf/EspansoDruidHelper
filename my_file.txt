@@ -1,0 +1,10 @@
+matches:
+
+- trigger: 'hello'
+  replace: 'world'
+
+- trigger: 'hello'
+  replace: 'world'
+
+- trigger: 'hello'
+  replace: 'world'
