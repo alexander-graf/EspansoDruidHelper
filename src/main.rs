@@ -1,10 +1,14 @@
 use druid::{AppLauncher, Data, Lens, Widget, WidgetExt, WindowDesc};
-use druid::widget::{Button, Flex, TextBox};
+use druid::widget::{Button, Flex, TextBox, CrossAxisAlignment, SizedBox};
 use std::process::Command;
 use std::path::Path;
 use dirs;
 use std::fs::OpenOptions;
 use std::io::Write;
+use druid::widget::prelude::*;
+
+
+
 
 
 #[derive(Clone, Data, Lens, Debug)]
@@ -30,44 +34,41 @@ fn open_folder() -> std::io::Result<()> {
 }
 
 impl MyApp {
-    fn append_to_file(&self) -> std::io::Result<()> {
-        let mut path = dirs::home_dir().ok_or(std::io::Error::new(std::io::ErrorKind::NotFound, "Home directory not found"))?;
-        path.push(".config/espanso/match/kustom.yml");
-        
-        let filename = path.to_str().unwrap();
-
-        let file_exists = Path::new(filename).exists();
-        let mut file = OpenOptions::new()
-            .create(true)
-            .append(true)
-            .open(filename)?;
-
-   
+  fn append_to_file(&self) -> std::io::Result<()> {
+    let mut path = dirs::home_dir().ok_or(std::io::Error::new(std::io::ErrorKind::NotFound, "Home directory not found"))?;
+    path.push(".config/espanso/match/kustom.yml");
       
+    let filename = path.to_str().unwrap();
 
-        if !file_exists {
-            file.write_all(b"matches:\n")?;
-            println!("Created new file.");
-        }
-        else {
-            println!("File already exists.");
-        }
+    let file_exists = Path::new(filename).exists();
+    let mut file = OpenOptions::new()
+      .create(true)
+      .append(true)
+      .open(filename)?;
 
-        let formatted_replace = if self.replace.contains('\n') {
-            let indented_replace = self.replace
-                .lines()
-                .map(|line| format!("  {}", line))
-                .collect::<Vec<_>>()
-                .join("\n");
-            format!("\n- trigger: '{}'\n  replace: |\n{}\n", self.trigger, indented_replace)
-        } else {
-            format!("\n- trigger: '{}'\n  replace: '{}'\n", self.trigger, self.replace)
-        };
-
-        file.write_all(formatted_replace.as_bytes())?;
-        Ok(())
+    if !file_exists {
+      file.write_all(b"matches:\n")?;
+      println!("Created new file.");
     }
-    // other methods...
+    else {
+      println!("File already exists.");
+    }
+
+    let formatted_replace = if self.replace.contains('\n') {
+      let indented_replace = self.replace
+        .lines()
+        .map(|line| format!("   {}", line))  // Add as many spaces as you need here
+        .collect::<Vec<_>>()
+        .join("\n");
+      format!("\n- trigger: '{}'\n  replace: |\n{}\n", self.trigger, indented_replace)
+    } else {
+      format!("\n- trigger: '{}'\n  replace: '{}'\n", self.trigger, self.replace)
+    };
+
+    file.write_all(formatted_replace.as_bytes())?;
+    Ok(())
+  }
+  // other methods...
 }
 
 fn main() {
@@ -102,9 +103,12 @@ fn ui_builder() -> impl Widget<MyApp> {
         .with_placeholder("Trigger")
         .lens(MyApp::trigger);
 
-    let replace_textbox = TextBox::new()
-        .with_placeholder("Replace")
-        .lens(MyApp::replace);
+        let replace_textbox = SizedBox::new(
+            TextBox::multiline()
+                .with_placeholder("Replace")
+                .lens(MyApp::replace)
+        ).height(100.0);
+        
 
     let open_folder_button = Button::new("Open Folder")
         .on_click(|_ctx, _data: &mut MyApp, _env| {
@@ -124,7 +128,8 @@ fn ui_builder() -> impl Widget<MyApp> {
         .with_child(replace_textbox)
         .with_child(open_folder_button);
 
-    Flex::column()
+        Flex::column()
+        .cross_axis_alignment(CrossAxisAlignment::Start) // Add this line for left alignment
         .with_child(trigger_and_button)
         .with_child(replace_and_open_folder)
 }

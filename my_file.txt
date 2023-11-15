@@ -8,3 +8,42 @@ matches:
 
 - trigger: 'hello'
   replace: 'world'
+- trigger: 'time'
+  replace: |
+can you fuck
+- trigger: 'time'
+  replace: |
+can you fuck
+- trigger: 'time'
+  replace: |
+can you fuck
+- trigger: 'time'
+  replace: |
+can you fuck
+- trigger: 'time'
+  replace: |
+can you fuck
+- trigger: 'time'
+  replace: |
+can you fuck
+- trigger: 'hello'
+  replace: |
+world
+- trigger: 'hello'
+  replace: |
+world
+- trigger: 'hello'
+  replace: |
+world
+- trigger: 'hello'
+  replace: |
+world
+- trigger: 'hellossdf'
+  replace: |
+world
+- trigger: 'hellossdf'
+  replace: |
+world
+- trigger: 'hellossdf'
+  replace: |
+world
